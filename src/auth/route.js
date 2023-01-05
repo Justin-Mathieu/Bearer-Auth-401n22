@@ -1,6 +1,6 @@
 const express = require('express');
 const base64 = require('base-64');
-const { User } = require('../models');
+const { User } = require('./model');
 const jwt = require("jsonwebtoken");
 
 
@@ -10,8 +10,7 @@ const authRoutes = express();
 
 // Make a POST request to the/signup route with username and password.
 authRoutes.post('/signup', signup);
-// Make a POST request to the /signin route.
-authRoutes.post('/signin', signin);
+
 
 async function signup(req, res, next) {
     try {
