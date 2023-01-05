@@ -1,6 +1,10 @@
 const express = require('express');
 const base64 = require('base-64');
 const { User } = require('../models');
+const jwt = require("jsonwebtoken");
+
+
+const secret = process.env.SECRET
 
 const authRoutes = express();
 
@@ -15,9 +19,9 @@ async function signup(req, res, next) {
         const { username, password } = req.body;
         await User.createWithHashed(username, password);
         res.send(201);
-    } catch (cause) {
+    } catch (error) {
         // On any error, trigger your error handler with an appropriate error.
-        next(new Error('Failed to create user', { cause }));
+        next(new Error('Failed to create user'));
     }
 }
 
@@ -36,10 +40,31 @@ async function signin(req, res, next) {
     const [username, password] = authorization.split(':');
     let user = await User.findLoggedIn(username, password);
     if (user) {
-        res.status(200).send({ username: user.username });
+        const payload = { username: user.username }
+        const token = jwt.sign(payload, secret, { expiresIn: '10m' })
+        res.send(token)
     } else {
         next(new Error('Invalid login'));
     }
 }
 
-module.exports = { authRoutes };
+
+async function validateToken(req, next) {
+    const authorization = req.header("Authorization") ?? "";
+    if (!authorization.startsWith('Bearer ')) {
+        next(new Error("Missing Bearer Header"));
+        return;
+    }
+
+    try {
+        const token = authorization.replace("Bearer ", "")
+        const decode = jwt.verify(token, secret);
+        req.username = decode.username;
+        next();
+    }
+    catch (error) {
+        next(new Error("not authorized decode failed", { error: error }))
+
+    }
+}
+module.exports = { authRoutes, validateToken, signin, signup, };

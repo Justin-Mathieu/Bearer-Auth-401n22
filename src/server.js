@@ -1,11 +1,12 @@
 const express = require('express');
 const { userRoutes } = require('./routes/user.route');
+const { authRoutes } = require("./auth/route")
 
 const server = express();
 
 server.use(logger);
 server.use(express.json());
-
+server.use(authRoutes);
 server.get('/hello', (_, res) => res.send('Hello!'));
 server.use((req, res, next) => {
     if (req.method === 'GET' && req.path.startsWith('/hello')) {
@@ -50,10 +51,10 @@ server.get('/pass_error', (req, res, next) => {
     next('Something bad');
 });
 
-server.use('*', (_, res) => res.status(404).send('No handler found 🙃'));
-server.use((err, req, res, next) => {
-    res.status(500).send({ message: 'there was a problem! 🧨', err });
-});
+// server.use('*', (_, res) => res.status(404).send('No handler found 🙃'));
+// server.use((err, req, res, next) => {
+//     res.status(500).send({ message: 'there was a problem! 🧨', err });
+// });
 
 function logger(req, _, next) {
     // Log out the request path
