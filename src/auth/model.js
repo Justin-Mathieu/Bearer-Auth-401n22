@@ -5,7 +5,7 @@ const { sequelize } = require('../models');
 const COMPLEXITY = process.env.COMPLEXITY ?? 8;
 
 function makeUser(sequelize) {
-    const User = sequelize.define('AuthUser', {
+    const User = sequelize.define('User', {
         username: DataTypes.STRING,
         password: DataTypes.STRING,
     });

@@ -1,11 +1,12 @@
 const express = require('express');
 const { userRoutes } = require('./routes/user.route');
+const { authRoutes } = require("./auth/route")
 
 const server = express();
 
 server.use(logger);
 server.use(express.json());
-
+server.use(authRoutes);
 server.get('/hello', (_, res) => res.send('Hello!'));
 server.use((req, res, next) => {
     if (req.method === 'GET' && req.path.startsWith('/hello')) {
